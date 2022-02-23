@@ -51,3 +51,8 @@ func (T TSPLLabel) Cmd(command TSPLCommand) TSPLLabelBuilder {
 
 	return T
 }
+
+func (T TSPLLabel) GetLabelData() ([]byte, error) {
+
+	return T.getTSPLCode()
+}
