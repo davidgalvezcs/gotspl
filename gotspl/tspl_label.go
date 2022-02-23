@@ -24,6 +24,7 @@ type TSPLLabel struct {
 type TSPLLabelBuilder interface {
 	TSPLCommandSequence
 	Cmd(command TSPLCommand) TSPLLabelBuilder
+	GetLabelData() ([]byte, error)
 }
 
 func NewTSPLLabel() TSPLLabelBuilder {
@@ -50,4 +51,9 @@ func (T TSPLLabel) Cmd(command TSPLCommand) TSPLLabelBuilder {
 	}
 
 	return T
+}
+
+func (T TSPLLabel) GetLabelData() ([]byte, error) {
+
+	return T.getTSPLCode()
 }
