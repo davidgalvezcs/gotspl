@@ -39,7 +39,7 @@ type BitmapImpl struct {
 	width       *int
 	height      *int
 	mode        *int
-	bitmapData  *string
+	bitmapData  *[]byte
 }
 
 type BitmapBuilder interface {
@@ -49,7 +49,7 @@ type BitmapBuilder interface {
 	Width(dots int) BitmapBuilder
 	Height(dots int) BitmapBuilder
 	Mode(mode BitmapMode) BitmapBuilder
-	BitmapData(bitmapdata string) BitmapBuilder
+	BitmapData(bitmapdata []byte) BitmapBuilder
 }
 
 func Bitmap() BitmapBuilder {
@@ -79,7 +79,7 @@ func (t BitmapImpl) GetMessage() ([]byte, error) {
 	buf.WriteString(VALUE_SEPARATOR)
 	buf.WriteString(strconv.Itoa(*t.mode))
 	buf.WriteString(VALUE_SEPARATOR)
-	buf.WriteString(*t.bitmapData)
+	buf.Write(*t.bitmapData)
 	buf.Write(LINE_ENDING_BYTES)
 	return buf.Bytes(), nil
 }
@@ -100,11 +100,11 @@ func (t BitmapImpl) YCoordinate(y int) BitmapBuilder {
 	return t
 }
 
-func (t BitmapImpl) Width(dots int) BitmapBuilder {
+func (t BitmapImpl) Width(bytes int) BitmapBuilder {
 	if t.width == nil {
 		t.width = new(int)
 	}
-	*t.width = dots
+	*t.width = bytes
 	return t
 }
 
@@ -124,9 +124,9 @@ func (t BitmapImpl) Mode(mode BitmapMode) BitmapBuilder {
 	return t
 }
 
-func (t BitmapImpl) BitmapData(bitmapdata string) BitmapBuilder {
+func (t BitmapImpl) BitmapData(bitmapdata []byte) BitmapBuilder {
 	if t.bitmapData == nil {
-		t.bitmapData = new(string)
+		t.bitmapData = new([]byte)
 	}
 	*t.bitmapData = bitmapdata
 	return t
