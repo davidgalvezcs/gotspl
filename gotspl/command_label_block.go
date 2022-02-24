@@ -25,25 +25,33 @@ import (
 const (
 	BLOCK_NAME = "BLOCK"
 
-	BLOCK_ALIGNMENT_DEFAILT BlockAlignment = iota
+	BLOCK_ALIGNMENT_DEFAULT BlockAlignment = iota
 	BLOCK_ALIGNMENT_LEFT
 	BLOCK_ALIGNMENT_CENTER
 	BLOCK_ALIGNMENT_RIGHT
+
+	BLOCK_FIT_NOSHRINK BlockFit = iota
+	BLOCK_FIT_SHRINK
 
 	BLOCK_MULTIPLIER_MIN = 1
 	BLOCK_MULTIPLIER_MAX = 10
 )
 
 type BlockAlignment int
+type BlockFit int
 
 type BlockImpl struct {
 	xCoordinate     *int
 	yCoordinate     *int
+	width           *int
+	height          *int
 	fontName        *string
 	rotation        *int
 	xMultiplication *float64
 	yMultiplication *float64
+	space           *int
 	alignment       *int
+	fit             *int
 	content         *string
 	contentQuote    bool
 }
@@ -52,11 +60,15 @@ type BlockBuilder interface {
 	TSPLCommand
 	XCoordinate(x int) BlockBuilder
 	YCoordinate(y int) BlockBuilder
+	Width(dots int) BlockBuilder
+	Height(dots int) BlockBuilder
 	FontName(name string) BlockBuilder
 	Rotation(angle int) BlockBuilder
 	XMultiplier(xm float64) BlockBuilder
 	YMultiplier(ym float64) BlockBuilder
+	Space(dots int) BlockBuilder
 	Alignment(align BlockAlignment) BlockBuilder
+	Fit(fit BlockFit) BlockBuilder
 	Content(content string, quote bool) BlockBuilder
 }
 
@@ -67,13 +79,15 @@ func Block() BlockBuilder {
 func (t BlockImpl) GetMessage() ([]byte, error) {
 	if t.xCoordinate == nil ||
 		t.yCoordinate == nil ||
+		t.width == nil ||
+		t.height == nil ||
 		t.fontName == nil ||
 		t.rotation == nil ||
 		t.content == nil ||
 		t.xMultiplication == nil ||
 		t.yMultiplication == nil {
 		return nil, errors.New("ParseError BLOCK Command: " +
-			"xCoordinate, yCoordinate, fontName, rotation, xMultiplication, yMultiplication and content should be specified")
+			"xCoordinate, yCoordinate, width, height, fontName, rotation, xMultiplication, yMultiplication and content should be specified")
 	}
 
 	if t.rotation != nil {
@@ -109,6 +123,10 @@ func (t BlockImpl) GetMessage() ([]byte, error) {
 	buf.WriteString(strconv.Itoa(*t.xCoordinate))
 	buf.WriteString(VALUE_SEPARATOR)
 	buf.WriteString(strconv.Itoa(*t.yCoordinate))
+	buf.WriteString(VALUE_SEPARATOR)
+	buf.WriteString(strconv.Itoa(*t.width))
+	buf.WriteString(VALUE_SEPARATOR)
+	buf.WriteString(strconv.Itoa(*t.height))
 	buf.WriteString(VALUE_SEPARATOR + DOUBLE_QUOTE)
 	buf.WriteString(*t.fontName)
 	buf.WriteString(DOUBLE_QUOTE + VALUE_SEPARATOR)
@@ -117,12 +135,20 @@ func (t BlockImpl) GetMessage() ([]byte, error) {
 	buf.Write(formatFloatWithUnits(*t.xMultiplication, false))
 	buf.WriteString(VALUE_SEPARATOR)
 	buf.Write(formatFloatWithUnits(*t.yMultiplication, false))
-	buf.WriteString(VALUE_SEPARATOR)
-	if t.alignment != nil {
-		buf.WriteString(strconv.Itoa(*t.alignment))
+	if t.space != nil {
 		buf.WriteString(VALUE_SEPARATOR)
+		buf.WriteString(strconv.Itoa(*t.space))
+	}
+	if t.alignment != nil {
+		buf.WriteString(VALUE_SEPARATOR)
+		buf.WriteString(strconv.Itoa(*t.alignment))
+	}
+	if t.fit != nil {
+		buf.WriteString(VALUE_SEPARATOR)
+		buf.WriteString(strconv.Itoa(*t.fit))
 	}
 
+	buf.WriteString(VALUE_SEPARATOR)
 	if t.contentQuote {
 		buf.WriteString(DOUBLE_QUOTE)
 	}
@@ -147,6 +173,22 @@ func (t BlockImpl) YCoordinate(y int) BlockBuilder {
 		t.yCoordinate = new(int)
 	}
 	*t.yCoordinate = y
+	return t
+}
+
+func (t BlockImpl) Width(dots int) BlockBuilder {
+	if t.width == nil {
+		t.width = new(int)
+	}
+	*t.width = dots
+	return t
+}
+
+func (t BlockImpl) Height(dots int) BlockBuilder {
+	if t.height == nil {
+		t.height = new(int)
+	}
+	*t.height = dots
 	return t
 }
 
@@ -182,11 +224,27 @@ func (t BlockImpl) YMultiplier(ym float64) BlockBuilder {
 	return t
 }
 
+func (t BlockImpl) Space(dots int) BlockBuilder {
+	if t.space == nil {
+		t.space = new(int)
+	}
+	*t.space = dots
+	return t
+}
+
 func (t BlockImpl) Alignment(align BlockAlignment) BlockBuilder {
 	if t.alignment == nil {
 		t.alignment = new(int)
 	}
 	*t.alignment = int(align)
+	return t
+}
+
+func (t BlockImpl) Fit(dots BlockFit) BlockBuilder {
+	if t.fit == nil {
+		t.fit = new(int)
+	}
+	*t.fit = int(dots)
 	return t
 }
 
