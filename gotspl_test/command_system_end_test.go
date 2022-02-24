@@ -16,8 +16,8 @@
 package gotspl_test
 
 import (
+	"../gotspl/gotospl"
 	"bytes"
-	"github.com/mrgloba/gotspl/gotspl"
 	"reflect"
 	"testing"
 )
