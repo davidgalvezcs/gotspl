@@ -25,7 +25,7 @@ import (
 const (
 	TEXT_NAME = "TEXT"
 
-	TEXT_ALIGNMENT_DEFAILT TextAlignment = iota
+	TEXT_ALIGNMENT_DEFAULT TextAlignment = iota
 	TEXT_ALIGNMENT_LEFT
 	TEXT_ALIGNMENT_CENTER
 	TEXT_ALIGNMENT_RIGHT
@@ -37,15 +37,15 @@ const (
 type TextAlignment int
 
 type TextImpl struct {
-	xCoordinate             *int
-	yCoordinate             *int
-	fontName				*string
-	rotation                *int
-	xMultiplication			*float64
-	yMultiplication			*float64
-	alignment				*int
-	content                 *string
-	contentQuote			bool
+	xCoordinate     *int
+	yCoordinate     *int
+	fontName        *string
+	rotation        *int
+	xMultiplication *float64
+	yMultiplication *float64
+	alignment       *int
+	content         *string
+	contentQuote    bool
 }
 
 type TextBuilder interface {
@@ -58,7 +58,6 @@ type TextBuilder interface {
 	YMultiplier(ym float64) TextBuilder
 	Alignment(align TextAlignment) TextBuilder
 	Content(content string, quote bool) TextBuilder
-
 }
 
 func Text() TextBuilder {
@@ -72,7 +71,7 @@ func (t TextImpl) GetMessage() ([]byte, error) {
 		t.rotation == nil ||
 		t.content == nil ||
 		t.xMultiplication == nil ||
-		t.yMultiplication == nil{
+		t.yMultiplication == nil {
 		return nil, errors.New("ParseError TEXT Command: " +
 			"xCoordinate, yCoordinate, fontName, rotation, xMultiplication, yMultiplication and content should be specified")
 	}
@@ -110,9 +109,9 @@ func (t TextImpl) GetMessage() ([]byte, error) {
 	buf.WriteString(strconv.Itoa(*t.xCoordinate))
 	buf.WriteString(VALUE_SEPARATOR)
 	buf.WriteString(strconv.Itoa(*t.yCoordinate))
-	buf.WriteString(VALUE_SEPARATOR+DOUBLE_QUOTE)
+	buf.WriteString(VALUE_SEPARATOR + DOUBLE_QUOTE)
 	buf.WriteString(*t.fontName)
-	buf.WriteString(DOUBLE_QUOTE+VALUE_SEPARATOR)
+	buf.WriteString(DOUBLE_QUOTE + VALUE_SEPARATOR)
 	buf.WriteString(strconv.Itoa(*t.rotation))
 	buf.WriteString(VALUE_SEPARATOR)
 	buf.Write(formatFloatWithUnits(*t.xMultiplication, false))
@@ -124,57 +123,77 @@ func (t TextImpl) GetMessage() ([]byte, error) {
 		buf.WriteString(VALUE_SEPARATOR)
 	}
 
-	if t.contentQuote { buf.WriteString(DOUBLE_QUOTE) }
+	if t.contentQuote {
+		buf.WriteString(DOUBLE_QUOTE)
+	}
 	buf.WriteString(*t.content)
-	if t.contentQuote { buf.WriteString(DOUBLE_QUOTE) }
+	if t.contentQuote {
+		buf.WriteString(DOUBLE_QUOTE)
+	}
 	buf.Write(LINE_ENDING_BYTES)
 	return buf.Bytes(), nil
 }
 
 func (t TextImpl) XCoordinate(x int) TextBuilder {
-	if t.xCoordinate == nil { t.xCoordinate = new(int) }
+	if t.xCoordinate == nil {
+		t.xCoordinate = new(int)
+	}
 	*t.xCoordinate = x
 	return t
 }
 
 func (t TextImpl) YCoordinate(y int) TextBuilder {
-	if t.yCoordinate == nil { t.yCoordinate = new(int) }
+	if t.yCoordinate == nil {
+		t.yCoordinate = new(int)
+	}
 	*t.yCoordinate = y
 	return t
 }
 
 func (t TextImpl) FontName(name string) TextBuilder {
-	if t.fontName == nil { t.fontName = new(string) }
+	if t.fontName == nil {
+		t.fontName = new(string)
+	}
 	*t.fontName = name
 	return t
 }
 
 func (t TextImpl) Rotation(angle int) TextBuilder {
-	if t.rotation == nil { t.rotation = new(int) }
+	if t.rotation == nil {
+		t.rotation = new(int)
+	}
 	*t.rotation = angle
 	return t
 }
 
 func (t TextImpl) XMultiplier(xm float64) TextBuilder {
-	if t.xMultiplication == nil { t.xMultiplication = new(float64) }
+	if t.xMultiplication == nil {
+		t.xMultiplication = new(float64)
+	}
 	*t.xMultiplication = xm
 	return t
 }
 
 func (t TextImpl) YMultiplier(ym float64) TextBuilder {
-	if t.yMultiplication == nil { t.yMultiplication = new(float64) }
+	if t.yMultiplication == nil {
+		t.yMultiplication = new(float64)
+	}
 	*t.yMultiplication = ym
 	return t
 }
 
 func (t TextImpl) Alignment(align TextAlignment) TextBuilder {
-	if t.alignment == nil { t.alignment = new(int) }
+	if t.alignment == nil {
+		t.alignment = new(int)
+	}
 	*t.alignment = int(align)
 	return t
 }
 
 func (t TextImpl) Content(content string, quote bool) TextBuilder {
-	if t.content == nil { t.content = new(string) }
+	if t.content == nil {
+		t.content = new(string)
+	}
 	*t.content = content
 	t.contentQuote = quote
 	return t
