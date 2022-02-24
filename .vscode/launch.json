@@ -8,8 +8,8 @@
       "name": "Launch Package",
       "type": "go",
       "request": "launch",
-      "mode": "test",
-      "program": "${workspaceFolder}/gotspl_test/"
+      "mode": "auto",
+      "program": "${workspaceRoot}/gotspl_test"
     }
   ]
 }
