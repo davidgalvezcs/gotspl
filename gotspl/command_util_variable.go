@@ -60,14 +60,17 @@ func (v VariableImpl) GetMessage() ([]byte, error) {
 
 	buf := bytes.NewBufferString(strings.ToUpper(*v.name))
 	buf.WriteString(EQUAL_SYMBOL)
-	if v.quote {
-		buf.WriteString(DOUBLE_QUOTE)
+	if v.data != nil {
+		buf.Write(*v.data)
+	} else {
+		if v.quote {
+			buf.WriteString(DOUBLE_QUOTE)
+		}
+		buf.WriteString(*v.value)
+		if v.quote {
+			buf.WriteString(DOUBLE_QUOTE)
+		}
 	}
-	buf.WriteString(*v.value)
-	if v.quote {
-		buf.WriteString(DOUBLE_QUOTE)
-	}
-
 	buf.Write(LINE_ENDING_BYTES)
 	return buf.Bytes(), nil
 }
@@ -93,6 +96,6 @@ func (v VariableImpl) Data(data []byte) VariableBuilder {
 	if v.value == nil {
 		v.data = new([]byte)
 	}
-	*v.data = daata
+	*v.data = data
 	return v
 }
