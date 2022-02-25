@@ -18,6 +18,7 @@ package gotspl
 import (
 	"bytes"
 	"errors"
+	"fmt"
 )
 
 const (
@@ -32,12 +33,16 @@ type DownloadStorage string
 type DownloadImpl struct {
 	storage *string
 	name    *string
+	data    *[]byte
+	// dataString *string
 }
 
 type DownloadBuilder interface {
 	TSPLCommand
 	Storage(storage DownloadStorage) DownloadBuilder
 	Name(name string) DownloadBuilder
+	Data(data []byte) DownloadBuilder
+	// DataString(data string) DownloadBuilder
 }
 
 func DownloadCmd() DownloadBuilder {
@@ -46,7 +51,10 @@ func DownloadCmd() DownloadBuilder {
 
 func (d DownloadImpl) GetMessage() ([]byte, error) {
 
-	if d.name == nil || len(*d.name) == 0 {
+	if (d.name == nil || len(*d.name) == 0) ||
+		(
+		// (d.dataString == nil || len(*d.dataString) == 0) &&
+		d.data == nil) {
 		return nil, errors.New("ParseError DOWNLOAD Command: name should be specified")
 	}
 
@@ -59,6 +67,11 @@ func (d DownloadImpl) GetMessage() ([]byte, error) {
 	buf.WriteString(DOUBLE_QUOTE)
 	buf.WriteString(*d.name)
 	buf.WriteString(DOUBLE_QUOTE)
+
+	buf.WriteString(VALUE_SEPARATOR)
+	buf.WriteString(fmt.Sprintf("%d", len(*d.data)))
+	buf.WriteString(VALUE_SEPARATOR)
+	buf.Write(*d.data)
 	buf.Write(LINE_ENDING_BYTES)
 	return buf.Bytes(), nil
 }
@@ -78,3 +91,19 @@ func (d DownloadImpl) Name(name string) DownloadBuilder {
 	*d.name = name
 	return d
 }
+
+func (d DownloadImpl) Data(data []byte) DownloadBuilder {
+	if d.name == nil {
+		d.data = new([]byte)
+	}
+	*d.data = data
+	return d
+}
+
+// func (d DownloadImpl) DataString(data string) DownloadBuilder {
+// 	if d.name == nil {
+// 		d.dataString = new(string)
+// 	}
+// 	*d.dataString = data
+// 	return d
+// }
