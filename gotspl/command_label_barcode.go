@@ -23,25 +23,25 @@ import (
 )
 
 const (
-	BARCODE_NAME = "BARCODE"
+	BARCODE_NAME               = "BARCODE"
 	BARCODE_HUMAN_READABLE_MIN = 0
 	BARCODE_HUMAN_READABLE_MAX = 3
-	BARCODE_ALIGNMENT_MIN = 0
-	BARCODE_ALIGNMENT_MAX = 3
+	BARCODE_ALIGNMENT_MIN      = 0
+	BARCODE_ALIGNMENT_MAX      = 3
 )
 
 type BarcodeImpl struct {
-	xCoordinate             *int
-	yCoordinate             *int
-	codeType				*string
-	height					*int
-	humanReadable			*int
-	rotation                *int
-	narrow					*int
-	wide					*int
-	alignment				*int
-	content                 *string
-	contentQuote			bool
+	xCoordinate   *int
+	yCoordinate   *int
+	codeType      *string
+	height        *int
+	humanReadable *int
+	rotation      *int
+	narrow        *int
+	wide          *int
+	alignment     *int
+	content       *string
+	contentQuote  bool
 }
 
 type BarcodeBuilder interface {
@@ -52,12 +52,11 @@ type BarcodeBuilder interface {
 	CodeType(codeType string) BarcodeBuilder
 	HumanReadable(humanReadable int) BarcodeBuilder
 	Rotation(angle int) BarcodeBuilder
-	Narrow( narrow int) BarcodeBuilder
+	Narrow(narrow int) BarcodeBuilder
 	Wide(wide int) BarcodeBuilder
 	Alignment(align int) BarcodeBuilder
 	Content(content string, quote bool) BarcodeBuilder
 }
-
 
 func BarcodeCmd() BarcodeBuilder {
 	return BarcodeImpl{}
@@ -101,7 +100,6 @@ func (b BarcodeImpl) GetMessage() ([]byte, error) {
 		}
 	}
 
-
 	if b.content == nil || len(*b.content) == 0 {
 		return nil, errors.New("ParseError BARCODE Command: content should be specified")
 	}
@@ -141,9 +139,13 @@ func (b BarcodeImpl) GetMessage() ([]byte, error) {
 
 	buf.WriteString(EMPTY_SPACE)
 
-	if b.contentQuote { buf.WriteString(DOUBLE_QUOTE) }
+	if b.contentQuote {
+		buf.WriteString(DOUBLE_QUOTE)
+	}
 	buf.WriteString(*b.content)
-	if b.contentQuote { buf.WriteString(DOUBLE_QUOTE) }
+	if b.contentQuote {
+		buf.WriteString(DOUBLE_QUOTE)
+	}
 	buf.Write(LINE_ENDING_BYTES)
 	return buf.Bytes(), nil
 }
@@ -163,7 +165,6 @@ func (b BarcodeImpl) YCoordinate(y int) BarcodeBuilder {
 	*b.yCoordinate = y
 	return b
 }
-
 
 func (b BarcodeImpl) Height(height int) BarcodeBuilder {
 	if b.height == nil {

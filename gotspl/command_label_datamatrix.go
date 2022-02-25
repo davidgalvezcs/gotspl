@@ -42,7 +42,7 @@ type DataMatrixImpl struct {
 	numberCols              *int
 	numberRows              *int
 	content                 *string
-	contentQuote			bool
+	contentQuote            bool
 }
 
 type DataMatrixBuilder interface {
@@ -156,9 +156,13 @@ func (d DataMatrixImpl) GetMessage() ([]byte, error) {
 		buf.WriteString(VALUE_SEPARATOR)
 	}
 
-	if d.contentQuote { buf.WriteString(DOUBLE_QUOTE) }
+	if d.contentQuote {
+		buf.WriteString(DOUBLE_QUOTE)
+	}
 	buf.WriteString(*d.content)
-	if d.contentQuote { buf.WriteString(DOUBLE_QUOTE) }
+	if d.contentQuote {
+		buf.WriteString(DOUBLE_QUOTE)
+	}
 	buf.Write(LINE_ENDING_BYTES)
 	return buf.Bytes(), nil
 }
