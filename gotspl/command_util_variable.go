@@ -26,12 +26,14 @@ type VariableImpl struct {
 	name  *string
 	value *string
 	quote bool
+	data  *[]byte
 }
 
 type VariableBuilder interface {
 	TSPLCommand
 	Name(name string) VariableBuilder
 	Value(value string, quote bool) VariableBuilder
+	Data(data []byte) VariableBuilder
 }
 
 func VariableCmd() VariableBuilder {
@@ -51,7 +53,8 @@ func IntVariable(name string, value int) VariableBuilder {
 }
 
 func (v VariableImpl) GetMessage() ([]byte, error) {
-	if v.name == nil || len(*v.name) == 0 || v.value == nil || len(*v.value) == 0 {
+	if v.name == nil || len(*v.name) == 0 ||
+		((v.value == nil || len(*v.value) == 0) && v.data == nil) {
 		return nil, errors.New("ParseError VALUE Command: name and value should be specified")
 	}
 
@@ -83,5 +86,13 @@ func (v VariableImpl) Value(value string, quote bool) VariableBuilder {
 	}
 	*v.value = value
 	v.quote = quote
+	return v
+}
+
+func (v VariableImpl) Data(data []byte) VariableBuilder {
+	if v.value == nil {
+		v.data = new([]byte)
+	}
+	*v.data = daata
 	return v
 }
