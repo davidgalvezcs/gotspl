@@ -93,7 +93,7 @@ func (d DownloadImpl) Name(name string) DownloadBuilder {
 }
 
 func (d DownloadImpl) Data(data []byte) DownloadBuilder {
-	if d.name == nil {
+	if d.data == nil {
 		d.data = new([]byte)
 	}
 	*d.data = data
