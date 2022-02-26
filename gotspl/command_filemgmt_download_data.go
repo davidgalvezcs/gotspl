@@ -18,43 +18,46 @@ package gotspl
 import (
 	"bytes"
 	"errors"
+	"fmt"
 )
 
 const (
-	DOWNLOAD_NAME                                     = "DOWNLOAD"
-	DOWNLOAD_STORGAE_DRAM             DownloadStorage = ""
-	DOWNLOAD_STORAGE_FLASH            DownloadStorage = "F"
-	DOWNLOAD_STORAGE_EXPANSION_MODULE DownloadStorage = "E"
+	DOWNLOAD_DATANAME                                         = "DOWNLOAD"
+	DOWNLOAD_DATASTORGAE_DRAM             DownloadDataStorage = ""
+	DOWNLOAD_DATASTORAGE_FLASH            DownloadDataStorage = "F"
+	DOWNLOAD_DATASTORAGE_EXPANSION_MODULE DownloadDataStorage = "E"
 )
 
-type DownloadStorage string
+type DownloadDataStorage string
 
-type DownloadImpl struct {
+type DownloadDataImpl struct {
 	storage *string
 	name    *string
-	data    *string
-	// dataString *string
+	data    *[]byte
 }
 
-type DownloadBuilder interface {
+type DownloadDataBuilder interface {
 	TSPLCommand
-	Storage(storage DownloadStorage) DownloadBuilder
-	Name(name string) DownloadBuilder
-	Data(data string) DownloadBuilder
+	Storage(storage DownloadDataStorage) DownloadDataBuilder
+	Name(name string) DownloadDataBuilder
+	Data(data []byte) DownloadDataBuilder
+	// DataString(data string) DownloadDataBuilder
 }
 
-func DownloadCmd() DownloadBuilder {
-	return DownloadImpl{}
+func DownloadDataCmd() DownloadDataBuilder {
+	return DownloadDataImpl{}
 }
 
-func (d DownloadImpl) GetMessage() ([]byte, error) {
+func (d DownloadDataImpl) GetMessage() ([]byte, error) {
 
 	if (d.name == nil || len(*d.name) == 0) ||
-		(d.data == nil || len(*d.data) == 0) {
+		(
+		// (d.dataString == nil || len(*d.dataString) == 0) &&
+		d.data == nil) {
 		return nil, errors.New("ParseError DOWNLOAD Command: name should be specified")
 	}
 
-	buf := bytes.NewBufferString(DOWNLOAD_NAME)
+	buf := bytes.NewBufferString(DOWNLOAD_DATANAME)
 	buf.WriteString(EMPTY_SPACE)
 	if d.storage != nil {
 		buf.WriteString(*d.storage)
@@ -64,13 +67,15 @@ func (d DownloadImpl) GetMessage() ([]byte, error) {
 	buf.WriteString(*d.name)
 	buf.WriteString(DOUBLE_QUOTE)
 
-	buf.Write(LINE_ENDING_BYTES)
-	buf.WriteString(*d.data)
+	buf.WriteString(VALUE_SEPARATOR)
+	buf.WriteString(fmt.Sprintf("%d", len(*d.data)))
+	buf.WriteString(VALUE_SEPARATOR)
+	buf.Write(*d.data)
 	buf.Write(LINE_ENDING_BYTES)
 	return buf.Bytes(), nil
 }
 
-func (d DownloadImpl) Storage(storage DownloadStorage) DownloadBuilder {
+func (d DownloadDataImpl) Storage(storage DownloadDataStorage) DownloadDataBuilder {
 	if d.storage == nil {
 		d.storage = new(string)
 	}
@@ -78,7 +83,7 @@ func (d DownloadImpl) Storage(storage DownloadStorage) DownloadBuilder {
 	return d
 }
 
-func (d DownloadImpl) Name(name string) DownloadBuilder {
+func (d DownloadDataImpl) Name(name string) DownloadDataBuilder {
 	if d.name == nil {
 		d.name = new(string)
 	}
@@ -86,9 +91,9 @@ func (d DownloadImpl) Name(name string) DownloadBuilder {
 	return d
 }
 
-func (d DownloadImpl) Data(data string) DownloadBuilder {
+func (d DownloadDataImpl) Data(data []byte) DownloadDataBuilder {
 	if d.data == nil {
-		d.data = new(string)
+		d.data = new([]byte)
 	}
 	*d.data = data
 	return d
