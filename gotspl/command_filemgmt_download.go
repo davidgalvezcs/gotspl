@@ -33,7 +33,6 @@ type DownloadImpl struct {
 	storage *string
 	name    *string
 	data    *string
-	// dataString *string
 }
 
 type DownloadBuilder interface {
