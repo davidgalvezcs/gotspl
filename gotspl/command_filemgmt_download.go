@@ -31,10 +31,10 @@ const (
 type DownloadStorage string
 
 type DownloadImpl struct {
-	storage *string
-	name    *string
-	data    *[]byte
-	// dataString *string
+	storage    *string
+	name       *string
+	data       *[]byte
+	dataString *string
 }
 
 type DownloadBuilder interface {
@@ -52,9 +52,7 @@ func DownloadCmd() DownloadBuilder {
 func (d DownloadImpl) GetMessage() ([]byte, error) {
 
 	if (d.name == nil || len(*d.name) == 0) ||
-		(
-		// (d.dataString == nil || len(*d.dataString) == 0) &&
-		d.data == nil) {
+		((d.dataString == nil || len(*d.dataString) == 0) && d.data == nil) {
 		return nil, errors.New("ParseError DOWNLOAD Command: name should be specified")
 	}
 
@@ -67,11 +65,15 @@ func (d DownloadImpl) GetMessage() ([]byte, error) {
 	buf.WriteString(DOUBLE_QUOTE)
 	buf.WriteString(*d.name)
 	buf.WriteString(DOUBLE_QUOTE)
-
-	buf.WriteString(VALUE_SEPARATOR)
-	buf.WriteString(fmt.Sprintf("%d", len(*d.data)))
-	buf.WriteString(VALUE_SEPARATOR)
-	buf.Write(*d.data)
+	if d.data != nil {
+		buf.WriteString(VALUE_SEPARATOR)
+		buf.WriteString(fmt.Sprintf("%d", len(*d.data)))
+		buf.WriteString(VALUE_SEPARATOR)
+		buf.Write(*d.data)
+	} else {
+		buf.WriteString(VALUE_SEPARATOR)
+		buf.WriteString(*d.dataString)
+	}
 	buf.Write(LINE_ENDING_BYTES)
 	return buf.Bytes(), nil
 }
@@ -100,10 +102,10 @@ func (d DownloadImpl) Data(data []byte) DownloadBuilder {
 	return d
 }
 
-// func (d DownloadImpl) DataString(data string) DownloadBuilder {
-// 	if d.name == nil {
-// 		d.dataString = new(string)
-// 	}
-// 	*d.dataString = data
-// 	return d
-// }
+func (d DownloadImpl) DataString(data string) DownloadBuilder {
+	if d.name == nil {
+		d.dataString = new(string)
+	}
+	*d.dataString = data
+	return d
+}
